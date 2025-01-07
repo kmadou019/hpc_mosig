@@ -12,5 +12,5 @@ Contient les sources C fournis pour le TP à savoir :
 
 test:
 
-./distanceEdition ../tests/GCA_024498555.1_ASM2449855v1_genomic.fna 77328790 20236404 ../tests/GCF_000001735.4_TAIR10.1_genomic.fna 3080812
-9 19944517
+./distanceEdition ../tests/GCA_024498555.1_ASM2449855v1_genomic.fna 77328790 20236404 ../tests/GCF_000001735.4_TAIR10.1_genomic.fna 30808129 19944517
+./distanceEdition ../tests/f1.fna 0 5 ../tests/f2.fna 0 13

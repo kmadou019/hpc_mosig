@@ -48,10 +48,6 @@ struct NW_NoMemoContext {
    size_t N;
 };
 
-long min(long a, long b) {
-   return (a < b) ? a : b;
-}
-
 
 void computeBlock(long begin_1, long end_1, long begin_2, long end_2, 
             long *tab, long *tab_dessus, long *tab_droite, long *last_i1j1,
@@ -123,9 +119,9 @@ long EditDistance_NW_CacheAware(char *A, size_t lengthA, char *B, size_t lengthB
    
    const long M = c->M;
    const long N = c->N;
-   long *tab = malloc(sizeof(long) * (N+1));
-   long *tab_droite = malloc(sizeof(long) * (N+1));
-   long *tab_dessus = malloc(sizeof(long) * (M+1));
+   long *tab        =(long *) malloc(sizeof(long) * (N+1));
+   long *tab_droite =(long *) malloc(sizeof(long) * (N+1));
+   long *tab_dessus =(long *) malloc(sizeof(long) * (M+1));
    long last_i1j1 = 0;
 
    tab_droite[N] = 0;

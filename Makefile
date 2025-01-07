@@ -1,7 +1,7 @@
 # Makefile qui genere l'executable distanceEdition et fait des tests de verification
 #
 #
-CC=gcc
+CC=nvcc
 LATEXC=pdflatex
 DOCC=doxygen
 CFLAGS=-g -Wall 
@@ -23,16 +23,16 @@ binary: $(BINDIR)/distanceEdition
 
 binary_perf: $(BINDIR)/distanceEdition-perf
 
-$(BINDIR)/distanceEdition-perf: $(SRCDIR)/distanceEdition.c $(BINDIR)/Needleman-Wunsch-recmemo.o
-	$(CC) $(OPT) -D__PERF_MESURE__ -I$(SRCDIR) -o $(BINDIR)/distanceEdition-perf $(BINDIR)/Needleman-Wunsch-recmemo.o $(SRCDIR)/distanceEdition.c 
+$(BINDIR)/distanceEdition-perf: $(SRCDIR)/distanceEdition.cu $(BINDIR)/Needleman-Wunsch-recmemo.o
+	$(CC) $(OPT) -D__PERF_MESURE__ -I$(SRCDIR) -o $(BINDIR)/distanceEdition-perf $(BINDIR)/Needleman-Wunsch-recmemo.o $(SRCDIR)/distanceEdition.cu 
 
 report: $(PDF) 
 
 doc: $(DOCDIR)/index.html
 
 
-$(BINDIR)/distanceEdition: $(SRCDIR)/distanceEdition.c $(BINDIR)/Needleman-Wunsch-recmemo.o
-	$(CC) $(OPT) -I$(SRCDIR) -o $(BINDIR)/distanceEdition $(BINDIR)/Needleman-Wunsch-recmemo.o $(SRCDIR)/distanceEdition.c 
+$(BINDIR)/distanceEdition: $(SRCDIR)/distanceEdition.cu $(BINDIR)/Needleman-Wunsch-recmemo.o
+	$(CC) $(OPT) -I$(SRCDIR) -o $(BINDIR)/distanceEdition $(BINDIR)/Needleman-Wunsch-recmemo.o $(SRCDIR)/distanceEdition.cu 
 
 $(BINDIR)/Needleman-Wunsch-recmemo.o: $(SRCDIR)/Needleman-Wunsch-recmemo.h $(SRCDIR)/Needleman-Wunsch-recmemo.cu $(SRCDIR)/characters_to_base.h
 	$(CC) $(OPT) -I$(SRCDIR) -c  -o $(BINDIR)/Needleman-Wunsch-recmemo.o $(SRCDIR)/Needleman-Wunsch-recmemo.cu
