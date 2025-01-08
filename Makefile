@@ -17,7 +17,8 @@ LATEXSOURCE=$(wildcard $(REPORTDIR)/*.tex)
 CSOURCE := $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/*.cu)
 PDF=$(LATEXSOURCE:.tex=.pdf)
 
-all: binary report doc binary_perf
+#all: binary report doc binary_perf
+all: binary report binary_perf
 
 binary: $(BINDIR)/distanceEdition
 
@@ -28,7 +29,7 @@ $(BINDIR)/distanceEdition-perf: $(SRCDIR)/distanceEdition.cu $(BINDIR)/Needleman
 
 report: $(PDF) 
 
-doc: $(DOCDIR)/index.html
+#doc: $(DOCDIR)/index.html
 
 
 $(BINDIR)/distanceEdition: $(SRCDIR)/distanceEdition.cu $(BINDIR)/Needleman-Wunsch-recmemo.o
@@ -52,8 +53,8 @@ $(BINDIR)/distanceEditiondebug: $(CSOURCE)
 %.pdf: $(LATEXSOURCE)
 	$(LATEXC) -output-directory $(REPORTDIR) $^ 
 
-$(DOCDIR)/index.html: $(SRCDIR)/Doxyfile $(CSOURCE)
-	$(DOCC) $(SRCDIR)/Doxyfile
+#$(DOCDIR)/index.html: $(SRCDIR)/Doxyfile $(CSOURCE)
+#	$(DOCC) $(SRCDIR)/Doxyfile
 
 
 test: $(BINDIR)/distanceEdition $(TESTDIR)/Makefile-test
