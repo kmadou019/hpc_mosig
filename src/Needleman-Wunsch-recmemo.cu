@@ -49,58 +49,8 @@ struct NW_NoMemoContext {
 };
 
 
-void computeBlock(long begin_1, long end_1, long begin_2, long end_2, 
-            long *tab, long *tab_dessus, long *tab_droite, long *last_i1j1,
-            struct NW_NoMemoContext *c) {
-   long last = 0;
-   for (long i = begin_1; i > end_1; i--) {
-      for (long j = begin_2; j > end_2; j--) {
-         long val_i1 = tab[j]; // valeur (i+1, j)
-         if (i == begin_1) val_i1 = tab_droite[j];
 
-         long val_j1 = tab[j + 1]; // valeur (i, j+1)
-         if (j == begin_2) val_j1 = tab_dessus[i];
-
-         long curr = tab[j];
-
-         if (!isBase(c->X[i])) tab[j] = val_i1;
-
-         else if (!isBase(c->Y[j])) tab[j] = val_j1;
-            
-         else {
-            long val_i1j1 = last; // valeur (i+1, j+1)
-            if (i == begin_1 && j == begin_2) val_i1j1 = *last_i1j1;
-            else if (i == begin_1) val_i1j1 = tab_droite[j + 1];
-
-            long min = (isUnknownBase(c->X[i]) ? SUBSTITUTION_UNKNOWN_COST :
-                          (isSameBase(c->X[i], c->Y[j]) ? 0 : SUBSTITUTION_COST)) + val_i1j1; 
-            
-            long val = INSERTION_COST + val_i1;      
-            if (val < min) min = val;
-
-            val = INSERTION_COST + val_j1;      
-            if (val < min) min = val;
-
-            tab[j] = min;
-         }
-
-         if (i == end_1 + 1 && j == end_2 + 1) *last_i1j1 = tab_droite[j];
-
-         last = curr;
-         if (j == end_2 + 1) last = tab_dessus[i];
-
-         if (j == end_2 + 1) tab_dessus[i] = tab[j];
-
-         if (i == end_1 + 1) tab_droite[j] = tab[j];
-
-      }
-   }
-
-}
-
-
-long EditDistance_NW_CacheAware(char *A, size_t lengthA, char *B, size_t lengthB,
-      int K1, int K2) {
+long EditDistance_NW_It(char *A, size_t lengthA, char *B, size_t lengthB) {
    _init_base_match();
    
    struct NW_NoMemoContext ctx;
@@ -119,36 +69,44 @@ long EditDistance_NW_CacheAware(char *A, size_t lengthA, char *B, size_t lengthB
    
    const long M = c->M;
    const long N = c->N;
-   long *tab        =(long *) malloc(sizeof(long) * (N+1));
-   long *tab_droite =(long *) malloc(sizeof(long) * (N+1));
-   long *tab_dessus =(long *) malloc(sizeof(long) * (M+1));
-   long last_i1j1 = 0;
-
-   tab_droite[N] = 0;
+   long *tab = malloc(sizeof(long) * (N+1));
+   long last = 0;
+   
+   tab[N] = 0;
    for (long j = N - 1; j >= 0; j--) {
-      tab_droite[j] = 2 * isBase(c->Y[j]) + tab_droite[j + 1];
+      tab[j] = 2 * isBase(c->Y[j]) + tab[j + 1];
    }
-   tab_dessus[M] = 0;
+
    for (long i = M - 1; i >= 0; i--) {
-      tab_dessus[i] = 2 * isBase(c->X[i]) + tab_dessus[i + 1];
-   }
+      for (long j = N; j >= 0; j--) {
+         long curr = tab[j];
 
-   for (long I = M - 1; I >= 0; I -= K1) {
-      long i_end = (I - K1 < 0) ? -1 : I - K1;
-      for (long J = N - 1; J >= 0; J -= K2) {
-         long j_end = (J - K2 < 0) ? -1 : J - K2;
+         if (j == N) tab[j] = 2 * isBase(c->X[i]) + tab[j];
 
-         computeBlock(I, i_end, J, j_end, 
-            tab, tab_dessus, tab_droite, &last_i1j1, c);
+         else if (!isBase(c->X[i])) tab[j] = tab[j];
 
+         else if (!isBase(c->Y[j])) tab[j] = tab[j + 1];
+            
+         else {
+            long min = (isUnknownBase(c->X[i]) ? SUBSTITUTION_UNKNOWN_COST :
+                          (isSameBase(c->X[i], c->Y[j]) ? 0 : SUBSTITUTION_COST)) + last; 
+            
+            long val = INSERTION_COST + tab[j];      
+            if (val < min) min = val;
+
+            val = INSERTION_COST + tab[j + 1];      
+            if (val < min) min = val;
+
+            tab[j] = min;
+         }
+
+         last = curr;
       }
    }
 
    long res = tab[0];
 
    free(tab);
-   free(tab_droite);
-   free(tab_dessus);
 
    return res;
 }
