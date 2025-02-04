@@ -18,6 +18,7 @@
 #include <string.h> /* for strchr */
 // #include <math.h>
 // #include <ctype.h> /* for toupper */
+#include "utils.h"
 
 #include "characters_to_base.h" /* mapping from char to base */
 
