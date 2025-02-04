@@ -1,7 +1,7 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
-#define N 9
+#define N 8
 #define THREADS_PER_BLOCK 8
 
 __global__ void prescan(float *d_out, float *d_in, int n) {
@@ -45,7 +45,7 @@ __global__ void prescan(float *d_out, float *d_in, int n) {
 }
 
 int main() {
-    float h_in[N] = {INFINITY,3, 1, 7, 0, 4, 1, 6, 3}; 
+    float h_in[N] = {INFINITY,3, 1, 7, 0, 4, 6, 3}; 
     float h_out[N];
 
     float *d_in, *d_out;
