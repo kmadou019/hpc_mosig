@@ -4,7 +4,7 @@
 #define N 16
 #define THREADS_PER_BLOCK 8
 
-float add(float a , float b){
+__global__ float add(float a , float b){
     return a + b;
 }
 
