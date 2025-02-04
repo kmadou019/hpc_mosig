@@ -1,7 +1,7 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
-#define N 8
+#define N 16
 #define THREADS_PER_BLOCK 8
 
 __global__ void prescan(float *d_out, float *d_in, int n) {
@@ -45,7 +45,7 @@ __global__ void prescan(float *d_out, float *d_in, int n) {
 }
 
 int main() {
-    float h_in[N] = {INFINITY,3, 1, 7, 0, 4, 6, 3}; 
+    float h_in[N] = {8, 3, 1, 7, 0, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, 4};
     float h_out[N];
 
     float *d_in, *d_out;
@@ -54,7 +54,7 @@ int main() {
 
     cudaMemcpy(d_in, h_in, N * sizeof(float), cudaMemcpyHostToDevice);
 
-    prescan<<<1, THREADS_PER_BLOCK, N * sizeof(float)>>>(d_out, d_in, N);
+    prescan<<<2, THREADS_PER_BLOCK, N * sizeof(float)>>>(d_out, d_in, N);
 
     cudaMemcpy(h_out, d_out, N * sizeof(float), cudaMemcpyDeviceToHost);
 
