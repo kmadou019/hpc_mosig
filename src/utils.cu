@@ -17,7 +17,7 @@ __global__ void prescan(float *d_out, float *d_in, int n) {
     for (int stride = 1; stride <= n / 2; stride *= 2) {
         int index = (tid + 1) * stride * 2 - 1;
         if (index < n) {
-            temp[index] += temp[index - stride];
+            temp[index] = min(temp[index] , temp[index - stride]);
         }
         __syncthreads();
     }
@@ -34,7 +34,7 @@ __global__ void prescan(float *d_out, float *d_in, int n) {
         if (index < n) {
             float t = temp[index - stride];
             temp[index - stride] = temp[index];
-            temp[index] += t;
+            temp[index] = min(temp[index], t);
         }
         __syncthreads();
     }
