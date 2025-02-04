@@ -4,13 +4,11 @@
 #define N 16
 #define THREADS_PER_BLOCK 8
 
+#define add(a , b) (a + b)
 
 __global__ void prescan(float *d_out, float *d_in, int n) {
     
-    float add(float a , float b){
-        return a + b;
-    }
-    
+
     extern __shared__ float temp[];  // Allocation dynamique de la mémoire partagée
     int tid = threadIdx.x;
 
