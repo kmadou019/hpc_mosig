@@ -52,6 +52,10 @@ int main() {
     float h_in[N] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, 4};
     float h_out[N];
 
+    std::cout << "Input: ";
+    for (int i = 0; i < N; i++) std::cout << h_in[i] << " ";
+    std::cout << std::endl;
+
     float *d_in, *d_out;
     cudaMalloc((void**)&d_in, N * sizeof(float));
     cudaMalloc((void**)&d_out, N * sizeof(float));
