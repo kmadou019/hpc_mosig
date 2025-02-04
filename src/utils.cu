@@ -28,7 +28,7 @@ __global__ void prescan(float *d_out, float *d_in, int n) {
 
     // Mise à zéro du dernier élément
     if (tid == 0) {
-        temp[n - 1] = INFINITY;
+        temp[n - 1] = 0;
     }
     __syncthreads();
 
