@@ -1,5 +1,6 @@
 #include <cuda_runtime.h>
 #include <iostream>
+#include "utils.h"
 
 #define N 16
 #define THREADS_PER_BLOCK 8
