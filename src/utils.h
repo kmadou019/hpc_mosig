@@ -1,1 +1,1 @@
-__global__ void prescan(float *d_out, float *d_in, int n);
+__global__ void prescan(long *d_out, long *d_in, long n);

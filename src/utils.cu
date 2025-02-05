@@ -5,11 +5,11 @@
 #define N 16
 #define THREADS_PER_BLOCK 8
 
-__global__ void prescan(float *d_out, float *d_in, int n) {
+__global__ void prescan(long *d_out, long *d_in, long n) {
     
 
-    extern __shared__ float temp[];  // Allocation dynamique de la mémoire partagée
-    int tid = threadIdx.x;
+    extern __shared__ long temp[];  // Allocation dynamique de la mémoire partagée
+    int tid = blockDim.x * blockIdx.x + threadIdx.x;
 
     // Chargement des données dans la mémoire partagée
     temp[2 * tid] = (2 * tid < n) ? d_in[2 * tid] : 0.0f;
@@ -17,8 +17,8 @@ __global__ void prescan(float *d_out, float *d_in, int n) {
     __syncthreads();
 
     // Phase d'upsweep (réduction)
-    for (int stride = 1; stride <= n / 2; stride *= 2) {
-        int index = (tid + 1) * stride * 2 - 1;
+    for (long stride = 1; stride <= n / 2; stride *= 2) {
+        long index = (tid + 1) * stride * 2 - 1;
         if (index < n) {
             temp[index] = min(temp[index] , temp[index - stride]);
         }
@@ -32,10 +32,10 @@ __global__ void prescan(float *d_out, float *d_in, int n) {
     __syncthreads();
 
     // Phase de downsweep (propagation)
-    for (int stride = n / 2; stride > 0; stride /= 2) {
-        int index = (tid + 1) * stride * 2 - 1;
+    for (long stride = n / 2; stride > 0; stride /= 2) {
+        long index = (tid + 1) * stride * 2 - 1;
         if (index < n) {
-            float t = temp[index - stride];
+            long t = temp[index - stride];
             temp[index - stride] = temp[index];
             temp[index] = min(temp[index], t);
         }
@@ -47,26 +47,26 @@ __global__ void prescan(float *d_out, float *d_in, int n) {
     if (2 * tid + 1 < n) d_out[2 * tid + 1] = temp[2 * tid + 1];
 }
 
-int main() {
-    float h_in[N] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, 4};
-    float h_out[N];
+long main() {
+    long h_in[N] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, 4};
+    long h_out[N];
 
     std::cout << "Input: ";
-    for (int i = 0; i < N; i++) std::cout << h_in[i] << " ";
+    for (long i = 0; i < N; i++) std::cout << h_in[i] << " ";
     std::cout << std::endl;
 
-    float *d_in, *d_out;
-    cudaMalloc((void**)&d_in, N * sizeof(float));
-    cudaMalloc((void**)&d_out, N * sizeof(float));
+    long *d_in, *d_out;
+    cudaMalloc((void**)&d_in, N * sizeof(long));
+    cudaMalloc((void**)&d_out, N * sizeof(long));
 
-    cudaMemcpy(d_in, h_in, N * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_in, h_in, N * sizeof(long), cudaMemcpyHostToDevice);
 
-    prescan<<<2, THREADS_PER_BLOCK, N * sizeof(float)>>>(d_out, d_in, N);
+    prescan<<<2, THREADS_PER_BLOCK, N * sizeof(long)>>>(d_out, d_in, N);
 
-    cudaMemcpy(h_out, d_out, N * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_out, d_out, N * sizeof(long), cudaMemcpyDeviceToHost);
 
     std::cout << "Prescan Output: ";
-    for (int i = 0; i < N; i++) std::cout << h_out[i] << " ";
+    for (long i = 0; i < N; i++) std::cout << h_out[i] << " ";
     std::cout << std::endl;
 
     cudaFree(d_in);
