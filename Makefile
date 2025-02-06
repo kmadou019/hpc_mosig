@@ -1,7 +1,8 @@
 # Makefile qui genere l'executable distanceEdition et fait des tests de verification
 #
 #
-CC=nvcc
+CC=gcc
+NVCC=nvcc
 LATEXC=pdflatex
 DOCC=doxygen
 CFLAGS=-g -Wall 
@@ -31,12 +32,21 @@ report: $(PDF)
 
 #doc: $(DOCDIR)/index.html
 
+# Compile utils.cu
+$(BINDIR)/utils.o: $(SRCDIR)/utils.cu $(SRCDIR)/utils.h
+	$(NVCC) $(OPT) -I$(SRCDIR) -c -o $@ $<
 
-$(BINDIR)/distanceEdition: $(SRCDIR)/distanceEdition.cu $(BINDIR)/Needleman-Wunsch-recmemo.o
-	$(CC) $(OPT) -I$(SRCDIR) -o $(BINDIR)/distanceEdition $(BINDIR)/Needleman-Wunsch-recmemo.o $(SRCDIR)/distanceEdition.cu 
+# Compile Needleman-Wunsch-recmemo.cu
+$(BINDIR)/Needleman-Wunsch-recmemo.o: $(SRCDIR)/Needleman-Wunsch-recmemo.cu $(SRCDIR)/Needleman-Wunsch-recmemo.h $(SRCDIR)/characters_to_base.h $(BINDIR)/utils.o
+	$(NVCC) $(OPT) -I$(SRCDIR) -c -o $@ $<
 
-$(BINDIR)/Needleman-Wunsch-recmemo.o: $(SRCDIR)/Needleman-Wunsch-recmemo.h $(SRCDIR)/Needleman-Wunsch-recmemo.cu $(SRCDIR)/characters_to_base.h
-	$(CC) $(OPT) -I$(SRCDIR) -c  -o $(BINDIR)/Needleman-Wunsch-recmemo.o $(SRCDIR)/Needleman-Wunsch-recmemo.cu
+# Compile distanceEdition.cu
+$(BINDIR)/distanceEdition.o: $(SRCDIR)/distanceEdition.cu
+	$(NVCC) $(OPT) -I$(SRCDIR) -c -o $@ $<
+
+# Link all object files into the final executable
+$(BINDIR)/distanceEdition: $(BINDIR)/utils.o $(BINDIR)/Needleman-Wunsch-recmemo.o $(BINDIR)/distanceEdition.o
+	$(NVCC) $(OPT) -o $@ $^
 	
 $(BINDIR)/extract-fasta-sequences-size: $(SRCDIR)/extract-fasta-sequences-size.c
 	$(CC) $(OPT) -I$(SRCDIR) -o $(BINDIR)/extract-fasta-sequences-size $(SRCDIR)/extract-fasta-sequences-size.c
