@@ -39,8 +39,7 @@ enum Base
  * 
  * \brief _base_match maps directly a char to its corresponding base 
  */ 
-static enum Base  _base_match[256] = { SKIP_BASE }; /* initially all chars are ignored */
-
+__constant__ enum Base  _base_match[256]; /* initially all chars are ignored */
 /**
  * \fn static void _init_base_match()
  * \brief definition of the  mapping from char to base
@@ -49,19 +48,23 @@ static enum Base  _base_match[256] = { SKIP_BASE }; /* initially all chars are i
  */
 static void  _init_base_match() /* initialisation of _base_match array for correspondence from char to base */
 { 
-   for (int c = 0; c < 256; ++c) _base_match[c] = SKIP_BASE ;
-   _base_match['a'] = ADENINE ;
-   _base_match['A'] = ADENINE ;
-   _base_match['c'] = CYTOSINE ;
-   _base_match['C'] = CYTOSINE ;
-   _base_match['g'] = GUANINE ;
-   _base_match['G'] = GUANINE ;
-   _base_match['t'] = THYMINE ;
-   _base_match['T'] = THYMINE ;
-   _base_match['u'] = URACILE ;
-   _base_match['U'] = URACILE ;
-   _base_match['n'] = UNKOWN_BASE ;
-   _base_match['N'] = UNKOWN_BASE ;
+   enum Base h_base_match[256];
+
+   for (int c = 0; c < 256; ++c) h_base_match[c] = SKIP_BASE ;
+   h_base_match['a'] = ADENINE ;
+   h_base_match['A'] = ADENINE ;
+   h_base_match['c'] = CYTOSINE ;
+   h_base_match['C'] = CYTOSINE ;
+   h_base_match['g'] = GUANINE ;
+   h_base_match['G'] = GUANINE ;
+   h_base_match['t'] = THYMINE ;
+   h_base_match['T'] = THYMINE ;
+   h_base_match['u'] = URACILE ;
+   h_base_match['U'] = URACILE ;
+   h_base_match['n'] = UNKOWN_BASE ;
+   h_base_match['N'] = UNKOWN_BASE ;
+
+   cudaMemcpyToSymbol(_base_match, h_base_match, sizeof(h_base_match)); 
 }
 
 
