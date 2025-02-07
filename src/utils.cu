@@ -48,7 +48,7 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
 }
 
 int main() {
-    long h_in[N] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, 4};
+    long h_in[N] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, -4};
     long h_out[N];
 
     std::cout << "Input: ";
