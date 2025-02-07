@@ -43,8 +43,8 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
     }
 
     // Stockage du résultat dans la mémoire globale
-    if (2 * tid + 1 < n) d_out[2 * tid] = temp[2 * tid + 1];
-    if (2 * tid + 1 + 1 < n) d_out[2 * tid + 1] = temp[2 * tid + 1 + 1];
+    if (2 * tid + 1 < n) d_out[2 * tid + 1] = temp[2 * tid ];
+    if (2 * tid + 1 + 1 < n) d_out[2 * tid + 1 + 1] = temp[2 * tid + 1];
 }
 
 int main() {
