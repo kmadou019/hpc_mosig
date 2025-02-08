@@ -48,8 +48,8 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
 }
 
 int main() {
-    long h_in[N] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, 4};
-    long h_out[N];
+    long h_in[N + 1] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, -1, -1};
+    long h_out[N + 1];
 
     std::cout << "Input: ";
     for (long i = 0; i < N; i++) std::cout << h_in[i] << " ";
@@ -57,15 +57,13 @@ int main() {
 
     long *d_in, *d_out;
     cudaMalloc((void**)&d_in, (N + 1)* sizeof(long));
-    cudaMalloc((void**)&d_out, N * sizeof(long));
+    cudaMalloc((void**)&d_out, (N + 1) * sizeof(long));
 
-    cudaMemcpy(d_in, h_in, N * sizeof(long), cudaMemcpyHostToDevice);
-
-    d_in[N+1] = d_in[N];
+    cudaMemcpy(d_in, h_in, (N+1) * sizeof(long), cudaMemcpyHostToDevice);
 
     prescan<<<2, THREADS_PER_BLOCK, (N+1) * sizeof(long)>>>(d_out, d_in, N+1);
 
-    cudaMemcpy(h_out, d_out, N * sizeof(long), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_out, d_out, (N+1) * sizeof(long), cudaMemcpyDeviceToHost);
 
     std::cout << "Prescan Output: ";
     for (long i = 0; i < N; i++) std::cout << h_out[i] << " ";
