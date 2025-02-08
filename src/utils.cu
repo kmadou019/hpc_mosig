@@ -48,7 +48,7 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
 }
 
 int main() {
-    long h_in[N + 1] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, -1, -1};
+    long h_in[N + 1] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, 0, 0};
     long h_out[N + 1];
 
     std::cout << "Input: ";
@@ -61,7 +61,7 @@ int main() {
 
     cudaMemcpy(d_in, h_in, (N+1) * sizeof(long), cudaMemcpyHostToDevice);
 
-    prescan<<<2, THREADS_PER_BLOCK, (N+1) * sizeof(long)>>>(d_out, d_in, N+1);
+    prescan<<<3, THREADS_PER_BLOCK, (N+1) * sizeof(long)>>>(d_out, d_in, N+1);
 
     cudaMemcpy(h_out, d_out, (N+1) * sizeof(long), cudaMemcpyDeviceToHost);
 
