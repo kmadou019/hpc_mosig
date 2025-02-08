@@ -43,12 +43,12 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
     }
 
     // Stockage du résultat dans la mémoire globale
-    if (2 * tid + 1 < n) d_out[2 * tid + 1] = temp[2 * tid ];
-    if (2 * tid + 1 + 1 < n) d_out[2 * tid + 1 + 1] = temp[2 * tid + 1];
+    if (2 * tid + 1 < n) d_out[2 * tid] = temp[2 * tid + 1];
+    if (2 * tid + 1 + 1 < n) d_out[2 * tid + 1] = temp[2 * tid + 1 + 1];
 }
 
 int main() {
-    long h_in[N] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, -4};
+    long h_in[N] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 5, 8, 1, 7, 4, 4};
     long h_out[N];
 
     std::cout << "Input: ";
@@ -56,12 +56,14 @@ int main() {
     std::cout << std::endl;
 
     long *d_in, *d_out;
-    cudaMalloc((void**)&d_in, N * sizeof(long));
+    cudaMalloc((void**)&d_in, (N + 1)* sizeof(long));
     cudaMalloc((void**)&d_out, N * sizeof(long));
 
     cudaMemcpy(d_in, h_in, N * sizeof(long), cudaMemcpyHostToDevice);
 
-    prescan<<<2, THREADS_PER_BLOCK, N * sizeof(long)>>>(d_out, d_in, N);
+    d_in[N+1] = d_in[N]
+
+    prescan<<<2, THREADS_PER_BLOCK, (N+1) * sizeof(long)>>>(d_out, d_in, N+1);
 
     cudaMemcpy(h_out, d_out, N * sizeof(long), cudaMemcpyDeviceToHost);
 
