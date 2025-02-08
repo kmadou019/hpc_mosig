@@ -43,8 +43,8 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
     }
 
     // Stockage du résultat dans la mémoire globale
-    if (2 * tid + 1 < n) d_out[2 * tid] = temp[2 * tid + 1];
-    if (2 * tid + 1 + 1 < n) d_out[2 * tid + 1] = temp[2 * tid + 1 + 1];
+    if (2 * tid < n) d_out[2 * tid] = temp[2 * tid];
+    if (2 * tid + 1 < n) d_out[2 * tid + 1] = temp[2 * tid + 1];
 }
 
 int main() {
@@ -61,7 +61,7 @@ int main() {
 
     cudaMemcpy(d_in, h_in, (N+1) * sizeof(long), cudaMemcpyHostToDevice);
 
-    prescan<<<3, THREADS_PER_BLOCK, (N+1) * sizeof(long)>>>(d_out, d_in, N+1);
+    prescan<<<2, THREADS_PER_BLOCK, (N+1) * sizeof(long)>>>(d_out, d_in, N+1);
 
     cudaMemcpy(h_out, d_out, (N+1) * sizeof(long), cudaMemcpyDeviceToHost);
 
