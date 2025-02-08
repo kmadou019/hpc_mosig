@@ -61,7 +61,7 @@ int main() {
 
     cudaMemcpy(d_in, h_in, N * sizeof(long), cudaMemcpyHostToDevice);
 
-    d_in[N+1] = d_in[N]
+    d_in[N+1] = d_in[N];
 
     prescan<<<2, THREADS_PER_BLOCK, (N+1) * sizeof(long)>>>(d_out, d_in, N+1);
 
