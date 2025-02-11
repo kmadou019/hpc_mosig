@@ -96,8 +96,9 @@ long EditDistance_NW_It(char *A, size_t lengthA, char *B, size_t lengthB) {
    const long M = c->M;
    const long N = c->N;
    const long size = sizeof(long) * (N+1);
-   long *h_tab_in = (long*)malloc(size);
-   long *h_tab_out= (long*)malloc(size);
+   const long size_masked = sizeof(long) * (N+1+1);
+   long *h_tab_in = (long*)malloc(size_masked);
+   long *h_tab_out= (long*)malloc(size_masked);
    
    long *d_tab_in ;
    long *d_tab_out;
@@ -118,10 +119,12 @@ long EditDistance_NW_It(char *A, size_t lengthA, char *B, size_t lengthB) {
 
       pre_compute_min<<< ceil(N/THREADS_PER_BLOCK) , THREADS_PER_BLOCK>>>(d_tab_in, d_tab_out, N, i,c);
 
-      cudaMemcpy(h_tab_out, d_tab_out, size, cudaMemcpyHostToDevice);
+      h_tab_out[N+1] = h_tab_out[N];
+      cudaMemcpy(d_tab_out, h_tab_out, size, cudaMemcpyHostToDevice);
       
       //val = INSERTION_COST + tab[j + 1];    // necessary for the scan 
-      prescan<<<ceil(N/THREADS_PER_BLOCK) , THREADS_PER_BLOCK>>>(h_tab_out,h_tab_out, N);
+
+      prescan<<<ceil(N/THREADS_PER_BLOCK) , THREADS_PER_BLOCK>>>(h_tab_out,h_tab_out, N+1);
 
       //permute tab_in and tab_out
 
