@@ -11,7 +11,6 @@
  */
 
 
-#include "Needleman-Wunsch-recmemo.h"
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <stdbool.h>
@@ -104,8 +103,8 @@ long EditDistance_NW_It(char *A, size_t lengthA, char *B, size_t lengthB) {
    long *d_tab_out;
 
    // alloc mem on GPU
-   cudaMalloc( (void**)&d_tab_in, size  );
-   cudaMalloc( (void**)&d_tab_out, size );
+   cudaMalloc( (void**)&d_tab_in, size_masked  );
+   cudaMalloc( (void**)&d_tab_out, size_masked );
 
    cudaMemcpy(d_tab_in, h_tab_in, size, cudaMemcpyHostToDevice);
    
@@ -124,7 +123,7 @@ long EditDistance_NW_It(char *A, size_t lengthA, char *B, size_t lengthB) {
       
       //val = INSERTION_COST + tab[j + 1];    // necessary for the scan 
 
-      prescan<<<ceil(N/THREADS_PER_BLOCK) , THREADS_PER_BLOCK>>>(h_tab_out,h_tab_out, N+1);
+      prescan<<<ceil(N/THREADS_PER_BLOCK) , THREADS_PER_BLOCK, size_masked>>>(h_tab_out,h_tab_out, N+1+1);
 
       //permute tab_in and tab_out
 
