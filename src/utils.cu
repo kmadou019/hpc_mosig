@@ -1,6 +1,8 @@
 #include <cuda_runtime.h>
 #include <iostream>
 #include "utils.h"
+#include "characters_to_base.h" /* mapping from char to base */
+
 
 #define THREADS_PER_BLOCK 8
 
@@ -17,7 +19,7 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
     for (long stride = 1; stride <= n / 2; stride *= 2) {
         long index = (tid + 1) * stride * 2 - 1;
         if (index < n) {
-            temp[index] = min(temp[index], temp[index - stride]);
+            temp[index] = min(temp[index], temp[index - stride]+INSERTION_COST);
         }
         __syncthreads();
     }
