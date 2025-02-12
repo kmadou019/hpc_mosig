@@ -17,14 +17,14 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
     for (long stride = 1; stride <= n / 2; stride *= 2) {
         long index = (tid + 1) * stride * 2 - 1;
         if (index < n) {
-            temp[index] = (temp[index] + temp[index - stride]);
+            temp[index] = min(temp[index], temp[index - stride]);
         }
         __syncthreads();
     }
 
     // Mise à zéro du dernier élément
     if (tid == 0) {
-        temp[n - 1] = 0;
+        temp[n - 1] = INFINITY;
     }
     __syncthreads();
 
@@ -34,7 +34,7 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
         if (index < n) {
             long t = temp[index - stride];
             temp[index - stride] = temp[index];
-            temp[index] = (temp[index]+t);
+            temp[index] = min(temp[index],t);
         }
         __syncthreads();
     }
@@ -51,7 +51,7 @@ int main() {
     long *h_in  = (long*)malloc((N+1) * sizeof(long));
     long *h_out = (long*)malloc((N+1) * sizeof(long));
 
-    long values[N] = {8, 3, 1, 7, 14, 4, 6, 3, 9, 2, 8, 1, 7, 4, 30};
+    long values[N] = {8, 3, 1, 7, 14, 4, -4, 3, 9, 2, 8, 1, -7, 4, 30};
     for (int i = 0; i < N; i++) {
         h_in[i] = values[i];
     }
