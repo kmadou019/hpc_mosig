@@ -19,7 +19,7 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
     for (long stride = 1; stride <= n / 2; stride *= 2) {
         long index = (tid + 1) * stride * 2 - 1;
         if (index < n) {
-            temp[index] = min(temp[index], temp[index - stride]+INSERTION_COST);
+            temp[index] = min(temp[index], temp[index - stride]);
         }
         __syncthreads();
     }
@@ -36,8 +36,9 @@ __global__ void prescan(long *d_out, long *d_in, long n) {
         if (index < n) {
             long t = temp[index - stride];
             temp[index - stride] = temp[index];
-            temp[index] = min(temp[index],t);
-        }
+            temp[index] = min(temp[index],t+INSERTION_COST);
+       	    if (index == 1) temp[index] -= INSERTION_COST;
+       	}
         __syncthreads();
     }
 
