@@ -15,10 +15,8 @@
 #include <stdlib.h> 
 #include <stdbool.h>
 #include <string.h> /* for strchr */
-// #include <math.h>
-// #include <ctype.h> /* for toupper */
 #include "utils.h"
-
+#include "Needleman-Wunsch-recmemo.h"
 #include "characters_to_base.h" /* mapping from char to base */
 
 #define THREADS_PER_BLOCK 8
@@ -75,7 +73,7 @@ __global__ void pre_compute_min(long* tab_in, long* tab_out, long N, long i, str
 
 }
 
-long EditDistance_NW_It(char *A, size_t lengthA, char *B, size_t lengthB) {
+long EditDistance_NW_GPU(char *A, size_t lengthA, char *B, size_t lengthB) {
    _init_base_match();
    
    struct NW_NoMemoContext ctx;
@@ -120,9 +118,6 @@ long EditDistance_NW_It(char *A, size_t lengthA, char *B, size_t lengthB) {
 
       h_tab_out[N+1] = h_tab_out[N];
       cudaMemcpy(d_tab_out, h_tab_out, size, cudaMemcpyHostToDevice);
-      
-      //val = INSERTION_COST + tab[j + 1];    // necessary for the scan 
-
       prescan<<<ceil(N/THREADS_PER_BLOCK) , THREADS_PER_BLOCK, size_masked>>>(h_tab_out,h_tab_out, N+1+1);
 
       //permute tab_in and tab_out
@@ -138,67 +133,3 @@ long EditDistance_NW_It(char *A, size_t lengthA, char *B, size_t lengthB) {
 
    return res;
 }
-
-
-
-//long EditDistance_NW_It(char *A, size_t lengthA, char *B, size_t lengthB) {
-//   _init_base_match();
-//   
-//   struct NW_NoMemoContext ctx;
-//   if (lengthA >= lengthB) {
-//      ctx.X = A;
-//      ctx.M = lengthA;
-//      ctx.Y = B;
-//      ctx.N = lengthB;
-//   } else {
-//      ctx.X = B;
-//      ctx.M = lengthB;
-//      ctx.Y = A;
-//      ctx.N = lengthA;
-//   }
-//   struct NW_NoMemoContext *c = &ctx;
-//   
-//   const long M = c->M;
-//   const long N = c->N;
-//   long *tab = malloc(sizeof(long) * (N+1));
-//   long last = 0;
-//   
-//   tab[N] = 0;
-//   for (long j = N - 1; j >= 0; j--) {
-//      tab[j] = 2 * isBase(c->Y[j]) + tab[j + 1];
-//   }
-//
-//   for (long i = M - 1; i >= 0; i--) {
-//      for (long j = N; j >= 0; j--) {
-//         long curr = tab[j];
-//
-//         if (j == N) tab[j] = 2 * isBase(c->X[i]) + tab[j];
-//
-//         else if (!isBase(c->X[i])) tab[j] = tab[j];
-//
-//         else if (!isBase(c->Y[j])) tab[j] = tab[j + 1];
-//            
-//         else {
-//            long min = (isUnknownBase(c->X[i]) ? SUBSTITUTION_UNKNOWN_COST :
-//                          (isSameBase(c->X[i], c->Y[j]) ? 0 : SUBSTITUTION_COST)) + last; 
-//            
-//            long val = INSERTION_COST + tab[j];   //   
-//            if (val < min) min = val;
-//
-//            val = INSERTION_COST + tab[j + 1];    //  
-//            if (val < min) min = val;
-//
-//            tab[j] = min;
-//         }
-//
-//         last = curr;
-//      }
-//   }
-//
-//   long res = tab[0];
-//
-//   free(tab);
-//
-//   return res;
-//}
-//
