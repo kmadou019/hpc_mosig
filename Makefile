@@ -67,7 +67,7 @@ $(BINDIR)/distanceEditiondebug: $(CSOURCE)
 #	$(DOCC) $(SRCDIR)/Doxyfile
 
 
-test: $(BINDIR)/distanceEdition $(TESTDIR)/Makefile-test
+test: srun --gres=shard:1 --cpus-per-task=4 --mem=2GB $(BINDIR)/distanceEdition $(TESTDIR)/Makefile-test
 	cd $(TESTDIR) ; make -f Makefile-test all 
 	
 test-valgrind: $(BINDIR)/distanceEdition $(TESTDIR)/Makefile-test
