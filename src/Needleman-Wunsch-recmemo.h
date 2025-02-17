@@ -48,7 +48,4 @@
  *
  */
 
-long EditDistance_NW_CacheAware(char *A, size_t lengthA, char *B, size_t lengthB,
-      int K1, int K2);
-
-long EditDistance_NW_It(char *A, size_t lengthA, char *B, size_t lengthB);
+long EditDistance_NW_GPU(char *A, size_t lengthA, char *B, size_t lengthB);

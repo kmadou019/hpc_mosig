@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
    struct myperf p;
    perfstart(&p) ;
 #endif
-    long res = EditDistance_NW_It(seq[0], length[0], seq[1], length[1]);
+    long res = EditDistance_NW_GPU(seq[0], length[0], seq[1], length[1]);
    //long res = EditDistance_NW_CacheAware(seq[0], length[0], seq[1], length[1], 10, 10);
    //long res = EditDistance_NW_Rec(seq[0], length[0], seq[1], length[1]);
    // long res = EditDistance_NW_CacheOblivious(seq[0], length[0], seq[1], length[1]);
